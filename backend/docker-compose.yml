@@ -1,0 +1,37 @@
+# Sobe o SQL Server e cria o banco InsuranceHub automaticamente.
+#   docker compose up -d
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: insurancehub-sql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    healthcheck:
+      test: ["CMD-SHELL", "S=$$(ls /opt/mssql-tools18/bin/sqlcmd /opt/mssql-tools/bin/sqlcmd 2>/dev/null | head -1); $$S -C -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+
+  # Roda uma vez, cria o banco e termina.
+  db-init:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    environment:
+      MSSQL_SA_PASSWORD: "YourStrong!Passw0rd"
+    volumes:
+      - ./create-db.sql:/create-db.sql:ro
+    entrypoint: ["/bin/bash", "-c"]
+    command:
+      - 'S=$$(ls /opt/mssql-tools18/bin/sqlcmd /opt/mssql-tools/bin/sqlcmd 2>/dev/null | head -1); $$S -C -S sqlserver -U sa -P "$$MSSQL_SA_PASSWORD" -i /create-db.sql && echo "Banco InsuranceHub pronto."'
+    restart: "no"
+
+volumes:
+  sqlserver_data:
