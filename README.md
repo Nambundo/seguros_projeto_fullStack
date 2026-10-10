@@ -99,39 +99,6 @@ Exemplos prontos para colar no IntelliJ/VS Code: `backend/requests.http`.
 
 ---
 
-## O que foi melhorado nesta versão
-
-**Correções (o projeto original não rodava direto)**
-- Faltava `vite.config.js` com o plugin do React → tela em branco / `React is not defined`. Adicionado.
-- `package.json` usava `"latest"` em tudo → versões fixadas (build reprodutível); Vite e plugin movidos para `devDependencies`.
-- `useEffect(load, [])` devolvia uma Promise (aviso do React) → corrigido.
-- O banco `InsuranceHub` precisava ser criado à mão → o `docker-compose` agora cria sozinho.
-
-**Backend**
-- **DTOs** (`record`) de entrada/saída em vez de expor entidades JPA; o cliente/apólice vêm como `clienteId`/`apoliceId`.
-- **Enums** para status (`StatusApolice`, `StatusSinistro`) em vez de `String` livre.
-- **Regras de negócio** nos services, `@Transactional`, e checagem de duplicidade com mensagens claras.
-- **Tratamento global de erros** com códigos HTTP corretos (antes, violação de FK/unique virava 500 e "campo obrigatório" virava 404).
-- `LAZY` + `@EntityGraph` nas listagens (evita N+1); `open-in-view` desligado.
-- Novo endpoint de **painel** e filtros por cliente/apólice.
-- CORS configurável; SQL no console desligado por padrão (`SHOW_SQL=true` para ligar).
-- **Testes unitários** (Mockito) das regras de sinistro/apólice e da validação de CPF: `mvn test`.
-
-**Frontend**
-- CRUD completo de **Clientes, Apólices e Sinistros** + **Painel**, com abas.
-- Erros do backend aparecem **em cada campo**; mensagens de sucesso, confirmação ao excluir, busca na tabela, estados de carregando/vazio.
-- Formatação em R$ e datas em dd/mm/aaaa; CPF com máscara.
-- Código organizado em `pages/`, `components/`, `hooks/` (`useCrud` e `useResource` eliminam repetição) e `utils/`.
-
----
-
-## Para explicar em entrevista
-- **Camadas:** Controller só fala HTTP; Service concentra regra de negócio e transação; Repository só acesso a dados.
-- **Por que DTO?** Desacopla o contrato da API do modelo do banco, evita expor campos internos e problemas de serialização com JPA/lazy.
-- **N+1:** listar apólices e buscar o cliente de cada uma gera 1+N consultas; `@EntityGraph` resolve com um único JOIN.
-- **Status code certo:** 400 (formato), 404 (não existe), 409 (conflito), 422 (regra de negócio).
-- **`ddl-auto=update`:** prático para estudo; em produção usar migrações (Flyway/Liquibase).
-- **Dinheiro:** `BigDecimal` (nunca `double`).
 
 ## Próximos passos sugeridos
 Autenticação (Spring Security + JWT), paginação (`Pageable`), migrações Flyway, testes de integração com Testcontainers, Dockerfile para backend/frontend, e documentação OpenAPI (springdoc).
