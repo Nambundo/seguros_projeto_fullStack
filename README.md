@@ -54,22 +54,6 @@ Abra **http://localhost:5173**.
 4. Aba **Painel** → veja os totais.
 
 ---
-
-## Problemas comuns
-
-| Sintoma | Causa provável / solução |
-|---|---|
-| Backend: `Cannot open database "InsuranceHub"` | O banco não foi criado. `docker compose logs db-init`; se falhou, crie manualmente: `CREATE DATABASE InsuranceHub;` (DBeaver, Azure Data Studio, SSMS). |
-| Backend: `Login failed for user 'sa'` | Senha diferente. Ajuste `DB_PASSWORD` ou use `YourStrong!Passw0rd` (a do compose). |
-| Backend: `Connection refused` na 1433 | Container ainda subindo ou parado: `docker compose ps`. |
-| `error: release version 17 not supported` | JDK antigo. Instale JDK 17+ e confira `JAVA_HOME`. |
-| Front mostra "Não foi possível conectar ao backend" | Backend fora do ar, ou porta diferente de 8080 (defina `VITE_API_URL` em `frontend/.env`). |
-| Erro de CORS no console | O front precisa rodar em `localhost:5173` (a porta é fixa). Para outra origem: variável `CORS_ORIGINS`. |
-| Mac com chip Apple (M1/M2/…) | A imagem do SQL Server é x86: ative a emulação/Rosetta no Docker Desktop. |
-| Já rodou a versão antiga e há dados nela | O formato de status mudou (agora é enum). Apague o volume: `docker compose down -v` e suba de novo. |
-
----
-
 ## API
 
 | Recurso | Endpoints |
